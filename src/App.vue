@@ -1,0 +1,174 @@
+<template>
+  <div class="app-container" :class="{ screenshot: isScreenshot }">
+  <div class="app-home" >
+    <div class="app-tips" >
+      <span class="app-tips-text" @click="toggle">
+        <i class="icon red"></i>
+        <i class="icon yellow"></i>
+        <i class="icon green"></i>
+      </span>
+      <span v-if="!isScreenshot" class="app-tips-text" >--ignore-certificate-errors --force-renderer-accessibility</span>
+    </div>
+    <div class="app-main">
+      <div class="menu-container">
+        <div class="g-menu second-level">
+          <div class="g-menu-item" tabindex="0" :class="{ 'is-active': item.value === route.path }" v-for="item in tools"
+            :key="item.value" @click="onRadioClick(item.value)">
+            <span class="icon">{{ item.icon }}</span>
+            <span class="label">{{ item.label }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="tool-container">
+        <router-view></router-view>
+      </div>
+    </div>
+    <div id="console-container"></div>
+  </div>
+</div>
+</template>
+
+<script lang="ts" setup>
+import editorConsoleInstance from './editor/console';
+import localforage from 'localforage';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { processContent } from './utils/transform';
+import { tools } from './config';
+import {
+  addCommandSave,
+  addContainer,
+  addEditorIntoManageList,
+  createEditorContainer,
+  createEditorInstance,
+  createEditorModel,
+  disposeEditorList,
+  setModelLanguage
+} from '../editor/editor';
+
+const isScreenshot = ref(false);
+const toggle = () => {
+  isScreenshot.value = !isScreenshot.value
+}
+onMounted(() => {
+  const $parent = document.getElementById('console-container') as HTMLElement;
+  editorConsoleInstance.mount($parent)
+})
+
+const route = useRoute();
+const router = useRouter();
+const onRadioClick = async (value: string) => {
+  router.push({ path: value })
+};
+</script>
+
+
+<style scoped>
+.app-container {
+  width: 1536px;
+  height: 768px;
+  padding: 8px;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  
+}
+
+.app-container.screenshot {
+  border: 1px solid #000;
+}
+
+.app-home {
+  width: 100%;
+  height: 100%;
+  background-color: #272822;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 1px 1px 10px #1e1e1e;
+  overflow: hidden;
+}
+
+.screenshot .app-home {
+  box-shadow: 1px 1px 10px #1e1e1e;
+}
+
+.app-tips {
+  font-family: monospace;
+  padding: 0 12px;
+  line-height: 30px;
+  height: 30px;
+  color: #cccccc;
+  background-color: #1e1e1e;
+  display: flex;
+  justify-content: space-between;
+}
+
+.app-tips .icon {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.icon.red {
+  background-color: #ff5f56;
+}
+.icon.yellow {
+  background-color: #ffbd2e;
+}
+
+.icon.green {
+  background-color: #27c93f;
+}
+.app-main {
+  flex: 1;
+  height: calc(100% - 30px);
+  display: flex;
+}
+
+.menu-container {
+  width: 150px;
+  height: 100%;
+}
+
+.tool-container {
+  height: 100%;
+  width: calc(100% - 150px);
+}
+
+.menu-container .icon {
+  display: inline-block;
+  font-size: 14px;
+  width: 24px;
+}
+
+#console-container {
+  position: absolute;
+  z-index: 9999;
+  left: 8px;
+  bottom: 8px;
+  right: 8px;
+  height: var(--terminal-height);
+  background-color: #1e1e1e;
+  border-top: 1px solid #393939;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+:deep #console-container .container {
+  width: 100%;
+  height: 100%;
+}
+
+.screenshot .menu-container,
+.screenshot #console-container {
+  display: none;
+}
+
+.screenshot .tool-container {
+  width: 100%;
+}
+</style>
