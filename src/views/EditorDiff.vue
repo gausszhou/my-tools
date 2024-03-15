@@ -41,16 +41,21 @@ editor1.setModel({
   modified: model2,
 })
 
+const route = useRoute();
+
 async function save() {
-  // const code1 = model1.getValue();
-  // await localforage.setItem(`tool.${language.value}`, code1)
+  const code1 = model1.getValue();
+  const code2 = model2.getValue()
+  await localforage.setItem(`my-tools${route.path}`, JSON.stringify({code1, code2}))
   editorConsoleInstance.addConsole("\t[INFO]\t" + "Save Success")
 }
 
 async function fetch() {
-  // await localforage.getItem(`tool.${language.value}`).then((value) => {
-  //   model1.setValue(value as string || code1)
-  // })
+  await localforage.getItem(`my-tools${route.path}`).then((value: any) => {
+    const {code1, code2} = JSON.parse(value);
+    model1.setValue(code1)
+    model2.setValue(code2)
+  })
   editorConsoleInstance.addConsole("\t[INFO]\t" + "Fetch Success")
 }
 

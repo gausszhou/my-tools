@@ -30,10 +30,8 @@ const editor2 = createEditorInstance($container2, model2, { readOnly: true }); /
 
 const route = useRoute();
 
-
 async function save() {
   const code1 = model1.getValue();
-  console.log(route.path)
   await localforage.setItem(`tool${route.path}`, code1)
   editorConsoleInstance.addConsole("\t[INFO]\t" + "Save Success")
 }
